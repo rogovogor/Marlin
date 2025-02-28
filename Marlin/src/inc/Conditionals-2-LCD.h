@@ -830,9 +830,9 @@
 // Touch screens leave space for extra buttons at the bottom
 #if ANY(HAS_UI_320x240, HAS_UI_480x272)
   #if ENABLED(TFT_COLOR_UI_PORTRAIT)
-    #define LCD_HEIGHT TERN(TOUCH_SCREEN, 8, 9)
-  #else
     #define LCD_HEIGHT TERN(TOUCH_SCREEN, 6, 7)
+  #else
+    #define LCD_HEIGHT TERN(TOUCH_SCREEN, 8, 9)
   #endif
 #elif HAS_UI_480x320
   #if ENABLED(TFT_COLOR_UI_PORTRAIT)

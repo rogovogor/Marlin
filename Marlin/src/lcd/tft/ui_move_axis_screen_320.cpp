@@ -98,9 +98,10 @@ void drawCurStepValue() {
 void drawMessage_P(PGM_P const msg) {
   tft.canvas(X_MARGIN,
     #if ENABLED(TFT_COLOR_UI_PORTRAIT)
-      TFT_HEIGHT - 2 * BTN_HEIGHT, TFT_WIDTH - X_MARGIN
-    #else
       TFT_HEIGHT - Y_MARGIN - 29, (TFT_WIDTH / 2) - (BTN_WIDTH / 2) - X_MARGIN
+    #else
+    TFT_HEIGHT - 2 * BTN_HEIGHT, TFT_WIDTH - X_MARGIN
+
     #endif
     , FONT_LINE_HEIGHT
   );
@@ -160,236 +161,236 @@ void MarlinUI::move_axis_screen() {
   #if ENABLED(TFT_COLOR_UI_PORTRAIT)
 
     /**************************************************************************
-     * ROW 1: | [E+] | [Y+] | [Z+] |
-     *************************************************************************/
-
-    int x = X_MARGIN, y = Y_MARGIN, spacing = 0;
-
-    TERN_(HAS_EXTRUDERS, drawBtn(x, y, "E+", e_plus, imgUp, E_BTN_COLOR, !busy));
-
-    spacing = (TFT_WIDTH - X_MARGIN * 2 - 3 * BTN_WIDTH) / 2;
-    x += BTN_WIDTH + spacing;
-    uint16_t yplus_x = x;
-
-    TERN_(HAS_Y_AXIS, drawBtn(x, y, "Y+", y_plus, imgUp, Y_BTN_COLOR, !busy));
-
-    x += BTN_WIDTH + spacing;
-    uint16_t zplus_x = x;
-
-    #if HAS_Z_AXIS
-      drawBtn(x, y, "Z+", z_plus, imgUp, Z_BTN_COLOR, !busy || ENABLED(BABYSTEP_ZPROBE_OFFSET)); // Only enabled when not busy or have baby step
-    #endif
-
-    /**************************************************************************
-     * ROW 2: | "Ex" | Current Y | "Z" |
-     *************************************************************************/
-
-    x = X_MARGIN;
-    y += BTN_HEIGHT + 2;
-
-    #if HAS_EXTRUDERS
-      motionAxisState.eNamePos.set(x, y);
-      drawCurESelection();
-      TERN_(TOUCH_SCREEN, if (!busy) touch.add_control(BUTTON, x, y, BTN_WIDTH, BTN_HEIGHT, e_select));
-    #endif
-
-    #if HAS_Y_AXIS
-      motionAxisState.yValuePos.set(yplus_x, y);
-      drawAxisValue(Y_AXIS);
-    #endif
-
-    #if HAS_Z_AXIS
-      motionAxisState.zTypePos.set(zplus_x, y);
-      drawCurZSelection();
-    #endif
-
-    /**************************************************************************
-     * ROW 3: | [X-] | [Home] | [X+] | "Z" |
-     *************************************************************************/
-
-    y += (TFT_HEIGHT - Y_MARGIN * 2 - 4 * BTN_HEIGHT) / 3 - 2;
-    x = X_MARGIN;
-
-    #if HAS_X_AXIS
-      drawBtn(x, y, "X-", x_minus, imgLeft, X_BTN_COLOR, !busy);
-      TERN_(TOUCH_SCREEN, add_control(TFT_WIDTH / 2 - images[imgHome].width / 2, y - (images[imgHome].width - BTN_HEIGHT) / 2, BUTTON, do_home, imgHome, !busy));
-      drawBtn(zplus_x, y, "X+", x_plus, imgRight, X_BTN_COLOR, !busy);
-    #endif
-
-    #if ALL(HAS_BED_PROBE, TOUCH_SCREEN)
-      if (!busy) touch.add_control(BUTTON, x, y, BTN_WIDTH, 34 * 2, z_select);
-    #endif
-
-    /**************************************************************************
-     * ROW 4: | Current X |
-     *************************************************************************/
-
-    y += BTN_HEIGHT + 2;
-
-    #if HAS_X_AXIS
-      motionAxisState.xValuePos.set(x, y);
-      drawAxisValue(X_AXIS);
-    #endif
-
-    /**************************************************************************
-     * ROW 5: | [E-] | [Y-] | [Z-] |
-     *************************************************************************/
-
-    y += (TFT_HEIGHT - Y_MARGIN * 2 - 4 * BTN_HEIGHT) / 3 - 2;
-    x = X_MARGIN;
-
-    #if HAS_EXTRUDERS
-      drawBtn(x, y, "E-", e_minus, imgDown, E_BTN_COLOR, !busy);
-      motionAxisState.eValuePos.set(x, y + BTN_HEIGHT + 2);
-      drawAxisValue(E_AXIS);
-    #endif
-
-    x += BTN_WIDTH + spacing;
-
-    TERN_(HAS_Y_AXIS, drawBtn(x, y, "Y-", y_minus, imgDown, Y_BTN_COLOR, !busy));
-
-    x += BTN_WIDTH + spacing;
-
-    #if HAS_Z_AXIS
-      drawBtn(x, y, "Z-", z_minus, imgDown, Z_BTN_COLOR, !busy || ENABLED(BABYSTEP_ZPROBE_OFFSET)); // Only enabled when not busy or have baby step
-      motionAxisState.zValuePos.set(x, y + BTN_HEIGHT + 2);
-      drawAxisValue(Z_AXIS);
-    #endif
-
-    /**************************************************************************
-     * ROW 6: | Step Size | [Disable Steppers] | [Back] |
-     *************************************************************************/
-
-    y = TFT_HEIGHT - Y_MARGIN - BTN_HEIGHT;
-    x = zplus_x - CUR_STEP_VALUE_WIDTH - 10;
-    motionAxisState.stepValuePos.set(X_MARGIN + BTN_WIDTH - CUR_STEP_VALUE_WIDTH, y);
-
-    if (!busy) {
-      drawCurStepValue();
-      TERN_(TOUCH_SCREEN, touch.add_control(BUTTON, motionAxisState.stepValuePos.x, motionAxisState.stepValuePos.y, CUR_STEP_VALUE_WIDTH, BTN_HEIGHT, step_size));
-    }
-
-    // Aligned with x+
-    drawBtn(yplus_x, y, "off", disable_steppers, imgCancel, COLOR_WHITE, !busy);
-
-  #else // !TFT_COLOR_UI_PORTRAIT
-
-    /**************************************************************************
      * ROW 1: | [E+] | [Y+] | Current Y | [Z+] |
      *************************************************************************/
 
-    int x = X_MARGIN, y = Y_MARGIN, spacing = 0;
+     int x = X_MARGIN, y = Y_MARGIN, spacing = 0;
 
-    TERN_(HAS_EXTRUDERS, drawBtn(x, y, "E+", e_plus, imgUp, E_BTN_COLOR, !busy));
-
-    spacing = (TFT_WIDTH - X_MARGIN * 2 - 3 * BTN_WIDTH) / 2;
-    x += BTN_WIDTH + spacing;
-    uint16_t yplus_x = x;
-
-    TERN_(HAS_Y_AXIS, drawBtn(x, y, "Y+", y_plus, imgUp, Y_BTN_COLOR, !busy));
-
-    x += BTN_WIDTH;
-
-    // Current Y
-    #if HAS_Y_AXIS
-      motionAxisState.yValuePos.set(x + 2, y);
-      drawAxisValue(Y_AXIS);
-    #endif
-
-    x += spacing;
-
-    #if HAS_Z_AXIS
-      drawBtn(x, y, "Z+", z_plus, imgUp, Z_BTN_COLOR, !busy || ENABLED(BABYSTEP_ZPROBE_OFFSET)); // Only enabled when not busy or have baby step
-    #endif
+     TERN_(HAS_EXTRUDERS, drawBtn(x, y, "E+", e_plus, imgUp, E_BTN_COLOR, !busy));
+ 
+     spacing = (TFT_WIDTH - X_MARGIN * 2 - 3 * BTN_WIDTH) / 2;
+     x += BTN_WIDTH + spacing;
+     uint16_t yplus_x = x;
+ 
+     TERN_(HAS_Y_AXIS, drawBtn(x, y, "Y+", y_plus, imgUp, Y_BTN_COLOR, !busy));
+ 
+     x += BTN_WIDTH;
+ 
+     // Current Y
+     #if HAS_Y_AXIS
+       motionAxisState.yValuePos.set(x + 2, y);
+       drawAxisValue(Y_AXIS);
+     #endif
+ 
+     x += spacing;
+ 
+     #if HAS_Z_AXIS
+       drawBtn(x, y, "Z+", z_plus, imgUp, Z_BTN_COLOR, !busy || ENABLED(BABYSTEP_ZPROBE_OFFSET)); // Only enabled when not busy or have baby step
+     #endif
+ 
+     /**************************************************************************
+      * ROW 2: | "Ex" | [X-] | [Home] | [X+] | "Z" |
+      *************************************************************************/
+ 
+     y += BTN_HEIGHT + (TFT_HEIGHT - Y_MARGIN * 2 - 4 * BTN_HEIGHT) / 3;
+     x = X_MARGIN;
+     spacing = (TFT_WIDTH - X_MARGIN * 2 - 5 * BTN_WIDTH) / 4;
+ 
+     #if HAS_EXTRUDERS
+       motionAxisState.eNamePos.set(x, y);
+       drawCurESelection();
+       TERN_(TOUCH_SCREEN, if (!busy) touch.add_control(BUTTON, x, y, BTN_WIDTH, BTN_HEIGHT, e_select));
+     #endif
+ 
+     x += BTN_WIDTH + spacing;
+ 
+     TERN_(HAS_X_AXIS, drawBtn(x, y, "X-", x_minus, imgLeft, X_BTN_COLOR, !busy));
+ 
+     x += BTN_WIDTH + spacing;
+ 
+     #if ALL(HAS_X_AXIS, TOUCH_SCREEN)
+       add_control(TFT_WIDTH / 2 - images[imgHome].width / 2, y - (images[imgHome].width - BTN_HEIGHT) / 2, BUTTON, do_home, imgHome, !busy);
+     #endif
+ 
+     x += BTN_WIDTH + spacing;
+     const uint16_t xplus_x = x;
+ 
+     TERN_(HAS_X_AXIS, drawBtn(x, y, "X+", x_plus, imgRight, X_BTN_COLOR, !busy));
+ 
+     x += BTN_WIDTH + spacing;
+ 
+     #if HAS_Z_AXIS
+       motionAxisState.zTypePos.set(x, y);
+       drawCurZSelection();
+       #if ALL(HAS_BED_PROBE, TOUCH_SCREEN)
+         if (!busy) touch.add_control(BUTTON, x, y, BTN_WIDTH, 34 * 2, z_select);
+       #endif
+     #endif
+ 
+     /**************************************************************************
+      * ROW 3: | [E-] | Current X | [Y-] | [Z-] |
+      *************************************************************************/
+ 
+     y += BTN_HEIGHT + (TFT_HEIGHT - Y_MARGIN * 2 - 4 * BTN_HEIGHT) / 3;
+     x = X_MARGIN;
+     spacing = (TFT_WIDTH - X_MARGIN * 2 - 3 * BTN_WIDTH) / 2;
+ 
+     #if HAS_EXTRUDERS
+       drawBtn(x, y, "E-", e_minus, imgDown, E_BTN_COLOR, !busy);
+       motionAxisState.eValuePos.set(x, y + BTN_HEIGHT + 2);
+       drawAxisValue(E_AXIS);
+     #endif
+ 
+     // Current X
+     #if HAS_X_AXIS
+       motionAxisState.xValuePos.set(BTN_WIDTH + (TFT_WIDTH - X_MARGIN * 2 - 5 * BTN_WIDTH) / 4, y - 10);
+       drawAxisValue(X_AXIS);
+     #endif
+ 
+     x += BTN_WIDTH + spacing;
+ 
+     // Current Y
+     TERN_(HAS_Y_AXIS, drawBtn(x, y, "Y-", y_minus, imgDown, Y_BTN_COLOR, !busy));
+ 
+     x += BTN_WIDTH + spacing;
+ 
+     // Current Z
+     #if HAS_Z_AXIS
+       drawBtn(x, y, "Z-", z_minus, imgDown, Z_BTN_COLOR, !busy || ENABLED(BABYSTEP_ZPROBE_OFFSET)); // Only enabled when not busy or have baby step
+       motionAxisState.zValuePos.set(x, y + BTN_HEIGHT + 2);
+       drawAxisValue(Z_AXIS);
+     #endif
+ 
+     /**************************************************************************
+      * ROW 4: | Step Size | [Disable Steppers] | [Back] |
+      *************************************************************************/
+ 
+     y = TFT_HEIGHT - Y_MARGIN - BTN_HEIGHT;
+     x = xplus_x - CUR_STEP_VALUE_WIDTH - 10;
+     motionAxisState.stepValuePos.set(yplus_x + BTN_WIDTH - CUR_STEP_VALUE_WIDTH, y);
+     if (!busy) {
+       drawCurStepValue();
+       TERN_(TOUCH_SCREEN, touch.add_control(BUTTON, motionAxisState.stepValuePos.x, motionAxisState.stepValuePos.y, CUR_STEP_VALUE_WIDTH, BTN_HEIGHT, step_size));
+     }
+ 
+     // Aligned with x+
+     drawBtn(xplus_x, y, "off", disable_steppers, imgCancel, COLOR_WHITE, !busy);
+ 
+  #else // !TFT_COLOR_UI_PORTRAIT
 
     /**************************************************************************
-     * ROW 2: | "Ex" | [X-] | [Home] | [X+] | "Z" |
+     * ROW 1: | [E+] | [Y+] | [Z+] |
      *************************************************************************/
 
-    y += BTN_HEIGHT + (TFT_HEIGHT - Y_MARGIN * 2 - 4 * BTN_HEIGHT) / 3;
-    x = X_MARGIN;
-    spacing = (TFT_WIDTH - X_MARGIN * 2 - 5 * BTN_WIDTH) / 4;
+     int x = X_MARGIN, y = Y_MARGIN, spacing = 0;
 
-    #if HAS_EXTRUDERS
-      motionAxisState.eNamePos.set(x, y);
-      drawCurESelection();
-      TERN_(TOUCH_SCREEN, if (!busy) touch.add_control(BUTTON, x, y, BTN_WIDTH, BTN_HEIGHT, e_select));
-    #endif
-
-    x += BTN_WIDTH + spacing;
-
-    TERN_(HAS_X_AXIS, drawBtn(x, y, "X-", x_minus, imgLeft, X_BTN_COLOR, !busy));
-
-    x += BTN_WIDTH + spacing;
-
-    #if ALL(HAS_X_AXIS, TOUCH_SCREEN)
-      add_control(TFT_WIDTH / 2 - images[imgHome].width / 2, y - (images[imgHome].width - BTN_HEIGHT) / 2, BUTTON, do_home, imgHome, !busy);
-    #endif
-
-    x += BTN_WIDTH + spacing;
-    const uint16_t xplus_x = x;
-
-    TERN_(HAS_X_AXIS, drawBtn(x, y, "X+", x_plus, imgRight, X_BTN_COLOR, !busy));
-
-    x += BTN_WIDTH + spacing;
-
-    #if HAS_Z_AXIS
-      motionAxisState.zTypePos.set(x, y);
-      drawCurZSelection();
-      #if ALL(HAS_BED_PROBE, TOUCH_SCREEN)
-        if (!busy) touch.add_control(BUTTON, x, y, BTN_WIDTH, 34 * 2, z_select);
-      #endif
-    #endif
-
-    /**************************************************************************
-     * ROW 3: | [E-] | Current X | [Y-] | [Z-] |
-     *************************************************************************/
-
-    y += BTN_HEIGHT + (TFT_HEIGHT - Y_MARGIN * 2 - 4 * BTN_HEIGHT) / 3;
-    x = X_MARGIN;
-    spacing = (TFT_WIDTH - X_MARGIN * 2 - 3 * BTN_WIDTH) / 2;
-
-    #if HAS_EXTRUDERS
-      drawBtn(x, y, "E-", e_minus, imgDown, E_BTN_COLOR, !busy);
-      motionAxisState.eValuePos.set(x, y + BTN_HEIGHT + 2);
-      drawAxisValue(E_AXIS);
-    #endif
-
-    // Current X
-    #if HAS_X_AXIS
-      motionAxisState.xValuePos.set(BTN_WIDTH + (TFT_WIDTH - X_MARGIN * 2 - 5 * BTN_WIDTH) / 4, y - 10);
-      drawAxisValue(X_AXIS);
-    #endif
-
-    x += BTN_WIDTH + spacing;
-
-    // Current Y
-    TERN_(HAS_Y_AXIS, drawBtn(x, y, "Y-", y_minus, imgDown, Y_BTN_COLOR, !busy));
-
-    x += BTN_WIDTH + spacing;
-
-    // Current Z
-    #if HAS_Z_AXIS
-      drawBtn(x, y, "Z-", z_minus, imgDown, Z_BTN_COLOR, !busy || ENABLED(BABYSTEP_ZPROBE_OFFSET)); // Only enabled when not busy or have baby step
-      motionAxisState.zValuePos.set(x, y + BTN_HEIGHT + 2);
-      drawAxisValue(Z_AXIS);
-    #endif
-
-    /**************************************************************************
-     * ROW 4: | Step Size | [Disable Steppers] | [Back] |
-     *************************************************************************/
-
-    y = TFT_HEIGHT - Y_MARGIN - BTN_HEIGHT;
-    x = xplus_x - CUR_STEP_VALUE_WIDTH - 10;
-    motionAxisState.stepValuePos.set(yplus_x + BTN_WIDTH - CUR_STEP_VALUE_WIDTH, y);
-    if (!busy) {
-      drawCurStepValue();
-      TERN_(TOUCH_SCREEN, touch.add_control(BUTTON, motionAxisState.stepValuePos.x, motionAxisState.stepValuePos.y, CUR_STEP_VALUE_WIDTH, BTN_HEIGHT, step_size));
-    }
-
-    // Aligned with x+
-    drawBtn(xplus_x, y, "off", disable_steppers, imgCancel, COLOR_WHITE, !busy);
-
+     TERN_(HAS_EXTRUDERS, drawBtn(x, y, "E+", e_plus, imgUp, E_BTN_COLOR, !busy));
+ 
+     spacing = (TFT_WIDTH - X_MARGIN * 2 - 3 * BTN_WIDTH) / 2;
+     x += BTN_WIDTH + spacing;
+     uint16_t yplus_x = x;
+ 
+     TERN_(HAS_Y_AXIS, drawBtn(x, y, "Y+", y_plus, imgUp, Y_BTN_COLOR, !busy));
+ 
+     x += BTN_WIDTH + spacing;
+     uint16_t zplus_x = x;
+ 
+     #if HAS_Z_AXIS
+       drawBtn(x, y, "Z+", z_plus, imgUp, Z_BTN_COLOR, !busy || ENABLED(BABYSTEP_ZPROBE_OFFSET)); // Only enabled when not busy or have baby step
+     #endif
+ 
+     /**************************************************************************
+      * ROW 2: | "Ex" | Current Y | "Z" |
+      *************************************************************************/
+ 
+     x = X_MARGIN;
+     y += BTN_HEIGHT + 2;
+ 
+     #if HAS_EXTRUDERS
+       motionAxisState.eNamePos.set(x, y);
+       drawCurESelection();
+       TERN_(TOUCH_SCREEN, if (!busy) touch.add_control(BUTTON, x, y, BTN_WIDTH, BTN_HEIGHT, e_select));
+     #endif
+ 
+     #if HAS_Y_AXIS
+       motionAxisState.yValuePos.set(yplus_x, y);
+       drawAxisValue(Y_AXIS);
+     #endif
+ 
+     #if HAS_Z_AXIS
+       motionAxisState.zTypePos.set(zplus_x, y);
+       drawCurZSelection();
+     #endif
+ 
+     /**************************************************************************
+      * ROW 3: | [X-] | [Home] | [X+] | "Z" |
+      *************************************************************************/
+ 
+     y += (TFT_HEIGHT - Y_MARGIN * 2 - 4 * BTN_HEIGHT) / 3 - 2;
+     x = X_MARGIN;
+ 
+     #if HAS_X_AXIS
+       drawBtn(x, y, "X-", x_minus, imgLeft, X_BTN_COLOR, !busy);
+       TERN_(TOUCH_SCREEN, add_control(TFT_WIDTH / 2 - images[imgHome].width / 2, y - (images[imgHome].width - BTN_HEIGHT) / 2, BUTTON, do_home, imgHome, !busy));
+       drawBtn(zplus_x, y, "X+", x_plus, imgRight, X_BTN_COLOR, !busy);
+     #endif
+ 
+     #if ALL(HAS_BED_PROBE, TOUCH_SCREEN)
+       if (!busy) touch.add_control(BUTTON, x, y, BTN_WIDTH, 34 * 2, z_select);
+     #endif
+ 
+     /**************************************************************************
+      * ROW 4: | Current X |
+      *************************************************************************/
+ 
+     y += BTN_HEIGHT + 2;
+ 
+     #if HAS_X_AXIS
+       motionAxisState.xValuePos.set(x, y);
+       drawAxisValue(X_AXIS);
+     #endif
+ 
+     /**************************************************************************
+      * ROW 5: | [E-] | [Y-] | [Z-] |
+      *************************************************************************/
+ 
+     y += (TFT_HEIGHT - Y_MARGIN * 2 - 4 * BTN_HEIGHT) / 3 - 2;
+     x = X_MARGIN;
+ 
+     #if HAS_EXTRUDERS
+       drawBtn(x, y, "E-", e_minus, imgDown, E_BTN_COLOR, !busy);
+       motionAxisState.eValuePos.set(x, y + BTN_HEIGHT + 2);
+       drawAxisValue(E_AXIS);
+     #endif
+ 
+     x += BTN_WIDTH + spacing;
+ 
+     TERN_(HAS_Y_AXIS, drawBtn(x, y, "Y-", y_minus, imgDown, Y_BTN_COLOR, !busy));
+ 
+     x += BTN_WIDTH + spacing;
+ 
+     #if HAS_Z_AXIS
+       drawBtn(x, y, "Z-", z_minus, imgDown, Z_BTN_COLOR, !busy || ENABLED(BABYSTEP_ZPROBE_OFFSET)); // Only enabled when not busy or have baby step
+       motionAxisState.zValuePos.set(x, y + BTN_HEIGHT + 2);
+       drawAxisValue(Z_AXIS);
+     #endif
+ 
+     /**************************************************************************
+      * ROW 6: | Step Size | [Disable Steppers] | [Back] |
+      *************************************************************************/
+ 
+     y = TFT_HEIGHT - Y_MARGIN - BTN_HEIGHT;
+     x = zplus_x - CUR_STEP_VALUE_WIDTH - 10;
+     motionAxisState.stepValuePos.set(X_MARGIN + BTN_WIDTH - CUR_STEP_VALUE_WIDTH, y);
+ 
+     if (!busy) {
+       drawCurStepValue();
+       TERN_(TOUCH_SCREEN, touch.add_control(BUTTON, motionAxisState.stepValuePos.x, motionAxisState.stepValuePos.y, CUR_STEP_VALUE_WIDTH, BTN_HEIGHT, step_size));
+     }
+ 
+     // Aligned with x+
+     drawBtn(yplus_x, y, "off", disable_steppers, imgCancel, COLOR_WHITE, !busy);
+ 
   #endif // !TFT_COLOR_UI_PORTRAIT
 
   TERN_(TOUCH_SCREEN, add_control(TFT_WIDTH - X_MARGIN - BTN_WIDTH, y, BACK, imgBack));
