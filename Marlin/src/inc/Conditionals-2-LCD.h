@@ -756,11 +756,11 @@
 
 #if ENABLED(TFT_RES_320x240)
   #if ENABLED(TFT_COLOR_UI_PORTRAIT)
-    #define TFT_WIDTH  240
-    #define TFT_HEIGHT 320
-  #else
     #define TFT_WIDTH  320
     #define TFT_HEIGHT 240
+  #else
+   #define TFT_WIDTH  240
+   #define TFT_HEIGHT 320
   #endif
   #define GRAPHICAL_TFT_UPSCALE 2
 #elif ENABLED(TFT_RES_480x272)
